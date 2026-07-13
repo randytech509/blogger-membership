@@ -6,9 +6,11 @@
 
 import { onUser } from "./auth.js";
 
-const PERSON_SVG = `<svg class="line" viewBox="0 0 24 24">
-  <path class="c" d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z"></path>
-  <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22"></path></svg>`;
+// Icône « connexion » (porte + flèche) — distincte de l'icône profil native du thème.
+const LOGIN_SVG = `<svg class="line" viewBox="0 0 24 24">
+  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+  <path d="M10 17l5-5-5-5"></path>
+  <path class="c" d="M15 12H3"></path></svg>`;
 
 function injectAuthIcon() {
   if (document.querySelector("li.isAuth")) return true;   // déjà injecté
@@ -21,7 +23,7 @@ function injectAuthIcon() {
   a.className = "tIc";
   a.href = "/p/login.html";
   a.setAttribute("aria-label", "Se connecter");
-  a.innerHTML = PERSON_SVG;
+  a.innerHTML = LOGIN_SVG;
   li.appendChild(a);
 
   // On place l'icône juste avant le bouton mode sombre (reste à droite).
@@ -36,12 +38,12 @@ function injectAuthIcon() {
         a.innerHTML = `<img src="${user.photoURL}" alt="" referrerpolicy="no-referrer"
           style="width:22px;height:22px;border-radius:50%;display:block;object-fit:cover;">`;
       } else {
-        a.innerHTML = PERSON_SVG;
+        a.innerHTML = LOGIN_SVG;
       }
     } else {
       a.href = "/p/login.html";
       a.setAttribute("aria-label", "Se connecter");
-      a.innerHTML = PERSON_SVG;
+      a.innerHTML = LOGIN_SVG;
     }
   });
   return true;
