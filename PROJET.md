@@ -54,14 +54,19 @@ contenu premium (articles étiquetés `premium`).
 - [x] **Espace admin** codé (`pages/admin.html` : membres + éditeur premium)
 - [x] **App Check** câblé dans la config (garde-fou tant que clé v3 absente)
 
+### ✅ Fait (déploiement Blogger)
+- [x] Clé reCAPTCHA v3 intégrée + App Check enregistré (console, côté user)
+- [x] **5 pages publiées** dans Blogger avec bons slugs (login, mon-compte, admin, confidentialite, conditions) — vérifiées en direct
+- [x] Page login validée live : carte « Welcome back », scripts non supprimés, CSS/JS jsDelivr, reCAPTCHA rendu, intégration Plus UI dark
+
 ### ⏳ Reste à faire
-- [ ] Créer clé reCAPTCHA **v3** → me la donner → App Check actif
-- [ ] Enregistrer App Check dans la console (clé secrète v3) puis activer l'enforcement Firestore **après** déploiement des pages
-- [ ] Créer l'OAuth App GitHub (Client ID/Secret → Firebase)
-- [ ] (Sécurité) restreindre la clé API par référents HTTP + fermer l'alerte GitHub
-- [ ] Coller les 5 pages dans Blogger (login, mon-compte, admin, confidentialite, conditions) + snippets thème
-- [ ] Se connecter 1×, puis se promouvoir admin dans Firestore (users/{uid} → role=admin)
-- [ ] Tests (login, paywall, admin, anti-bot)
+- [ ] **Se connecter 1× via Google** sur /p/login.html (crée le doc users/{uid})
+- [ ] Se promouvoir admin : Firestore console → users/{uid} → role=admin
+- [ ] Tester /p/mon-compte.html + /p/admin.html
+- [ ] Vérifier le graphe App Check (requêtes vérifiées) PUIS activer l'enforcement Firestore
+- [ ] Snippets thème Plus UI (scripts avant </head> + fs-premium-slot) — pour le paywall sur les articles
+- [ ] Créer l'OAuth App GitHub (Client ID/Secret → Firebase) pour le bouton GitHub
+- [ ] (Sécurité) restreindre la clé API par référents HTTP + fermer l'alerte GitHub secret-scanning
 
 ## Structure
 
