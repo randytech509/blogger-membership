@@ -13,6 +13,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check.js";
 
 export const firebaseConfig = {
   apiKey:            "AIzaSyDfapcXXSjPsuDvGbDXJ3klPSiu0RDaoeo",
@@ -31,10 +33,26 @@ export const LOGIN_URL   = "https://andetaynews.com/p/login.html";
 export const ACCOUNT_URL = "https://andetaynews.com/p/mon-compte.html";
 
 // Clé de site reCAPTCHA v2 « case à cocher » (le « Let us know you are human »).
-// Crée-la sur https://www.google.com/recaptcha/admin  (type v2 « I'm not a robot »).
 export const RECAPTCHA_SITE_KEY = "6LcU81EtAAAAANmvPGWqpz84ow-UjykokF9EsC9j";
 
+// Clé de site reCAPTCHA v3 (invisible) pour Firebase App Check = anti-bot RÉEL.
+// À créer sur https://www.google.com/recaptcha/admin (type v3), PUIS
+// enregistrer l'app dans Firebase ▸ App Check avec cette même clé.
+// Tant que la valeur contient "REMPLACE", App Check reste désactivé (aucune
+// gêne pour la connexion Google en cours de test).
+export const RECAPTCHA_V3_SITE_KEY = "REMPLACE_MOI_RECAPTCHA_V3";
+
 // Instances uniques réutilisées partout.
-export const app  = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+
+// App Check DOIT s'initialiser juste après l'app, avant Auth/Firestore.
+export let appCheck = null;
+if (RECAPTCHA_V3_SITE_KEY && !RECAPTCHA_V3_SITE_KEY.includes("REMPLACE")) {
+  appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
+
 export const auth = getAuth(app);
 export const db   = getFirestore(app);

@@ -1,36 +1,61 @@
 // ============================================================================
-//  Règles de sécurité Firestore — À COLLER dans Firebase ▸ Firestore ▸ Règles
+//  Règles de sécurité Firestore — projet andetaynews-counter
+//  Déploiement : npx firebase-tools deploy --only firestore:rules
 //  C'EST ICI que se joue la vraie sécurité (pas dans le fait de cacher l'apiKey).
 // ============================================================================
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Chaque utilisateur ne peut lire/écrire QUE son propre profil.
+    // --- Helpers -------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function hasProfile() {
+      return isSignedIn()
+             && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function isAdmin() {
+      return hasProfile() && userDoc().role == 'admin';
+    }
+    function isMember() {
+      return hasProfile() && userDoc().role in ['member', 'admin'];
+    }
+
+    // --- Profils utilisateurs ------------------------------------------------
     match /users/{uid} {
-      allow read:  if request.auth != null && request.auth.uid == uid;
+      // Lecture d'un profil : le sien, ou n'importe lequel si admin.
+      allow get: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      // Lister toute la collection : réservé aux admins (espace admin).
+      allow list: if isAdmin();
 
       // Création à la 1re connexion : rôle forcé à "member", uid cohérent.
-      allow create: if request.auth != null
+      allow create: if isSignedIn()
                     && request.auth.uid == uid
                     && request.resource.data.role == 'member';
 
-      // Mise à jour : l'utilisateur NE PEUT PAS changer son propre rôle.
-      // (promotion en "admin" = à faire à la main dans la console Firebase)
-      allow update: if request.auth != null
-                    && request.auth.uid == uid
-                    && request.resource.data.role == resource.data.role;
+      // Mise à jour :
+      //  - l'utilisateur peut MAJ ses infos SANS changer son rôle ;
+      //  - un admin peut tout modifier (y compris promouvoir un membre).
+      allow update: if isSignedIn() && (
+                      (request.auth.uid == uid
+                        && request.resource.data.role == resource.data.role)
+                      || isAdmin()
+                    );
 
-      allow delete: if false;
+      allow delete: if isAdmin();
     }
 
-    // --- Option B : contenu premium réellement protégé -----------------------
-    // Décommente si tu stockes le vrai contenu premium dans Firestore.
-    // match /premiumContent/{postId} {
-    //   allow read: if request.auth != null
-    //               && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member','admin'];
-    //   allow write: if false; // écriture depuis la console uniquement
-    // }
+    // --- Contenu premium (paywall inviolable) --------------------------------
+    // Le vrai contenu vit ici, jamais dans le HTML Blogger. Lisible seulement
+    // par un membre connecté ; écrit uniquement depuis l'espace admin.
+    match /premiumContent/{postId} {
+      allow read:               if isMember();
+      allow create, update, delete: if isAdmin();
+    }
 
     // Tout le reste est refusé par défaut.
     match /{document=**} { allow read, write: if false; }
