@@ -32,7 +32,7 @@ export const ACCOUNT_URL = "https://andetaynews.com/p/mon-compte.html";
 
 // Clé de site reCAPTCHA v2 « case à cocher » (le « Let us know you are human »).
 // Crée-la sur https://www.google.com/recaptcha/admin  (type v2 « I'm not a robot »).
-export const RECAPTCHA_SITE_KEY = "REMPLACE_MOI_RECAPTCHA";
+export const RECAPTCHA_SITE_KEY = "6LcU81EtAAAAANmvPGWqpz84ow-UjykokF9EsC9j";
 
 // Instances uniques réutilisées partout.
 export const app  = initializeApp(firebaseConfig);
