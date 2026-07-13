@@ -39,16 +39,19 @@ contenu premium (articles étiquetés `premium`).
 - [x] Repo public créé et poussé sur GitHub
 - [x] jsDelivr vérifié (HTTP 200 sur css/js)
 
-### ⏳ Reste à faire (côté user — comptes tiers)
-- [ ] Créer le projet Firebase (Auth + Firestore)
+### ✅ Fait (suite)
+- [x] Projet Firebase réutilisé : **andetaynews-counter** (CLI: loverandy2019@gmail.com, console: loverandy.bonnet1@gmail.com)
+- [x] `firebaseConfig` renseigné (récupéré en CLI) + poussé
+- [x] Base Firestore créée (édition Standard, eur3) — compteur reste sur Realtime DB
+- [x] `firestore.rules` déployées en CLI
+
+### ⏳ Reste à faire (côté user — console)
+- [ ] Activer les fournisseurs : Google, magic link (E-mail), GitHub
 - [ ] Créer l'OAuth App GitHub (Client ID/Secret → Firebase)
 - [ ] Autoriser les domaines : `andetaynews.com`, `www.andetaynews.com`, `andetaynews.blogspot.com`
-- [ ] Publier `firestore.rules` dans la console Firebase
-- [ ] Générer la clé reCAPTCHA v2
-- [ ] Remplir les `REMPLACE_MOI` (`js/firebase-config.js` + `data-sitekey` de `pages/login.html`)
-- [ ] Re-push + purge jsDelivr (`purge.jsdelivr.net/gh/randytech509/blogger-membership@main/js/firebase-config.js`)
-- [ ] Coller les 4 pages dans Blogger (mode Affichage HTML)
-- [ ] Appliquer les snippets du thème (scripts + `fs-premium` autour de `<data:post.body/>`)
+- [ ] Générer la clé reCAPTCHA v2 → remplir `RECAPTCHA_SITE_KEY` + `data-sitekey`, re-push, purge
+- [ ] (Sécurité) restreindre la clé API par référents HTTP + fermer l'alerte GitHub
+- [ ] Coller les 4 pages dans Blogger + snippets thème
 - [ ] Tests (checklist README, Phase 6)
 
 ## Structure
