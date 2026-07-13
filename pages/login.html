@@ -1,0 +1,62 @@
+<!-- ==========================================================================
+     PAGE BLOGGER « Login »  ▸  URL cible : /p/login.html
+     Comment l'ajouter :  Tableau de bord Blogger ▸ Pages ▸ Nouvelle page ▸
+     titre "Login" ▸ passe l'éditeur en mode « Affichage HTML » ▸ colle ceci.
+     ⚠️ Remplace randytech509/blogger-membership par ton dépôt GitHub (voir README).
+     ========================================================================== -->
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/css/auth.css">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<div class="fs-auth-wrap">
+  <div class="fs-card">
+    <h1>Welcome back</h1>
+    <p class="fs-sub">Connecte-toi pour accéder à ton espace membre.</p>
+
+    <!-- Google -->
+    <button id="fs-google" class="fs-btn" type="button">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.2 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.4-4.7 7.1l7.3 5.7c4.3-3.9 6.8-9.7 6.8-17.3z"/><path fill="#FBBC05" d="M10.5 28.3c-.5-1.4-.7-2.8-.7-4.3s.3-2.9.7-4.3l-7.9-6.1C.9 16.6 0 20.2 0 24s.9 7.4 2.6 10.4l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.4 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2 1.4-4.7 2.3-8.6 2.3-6.3 0-11.6-3.7-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+      Login with Google
+    </button>
+
+    <!-- GitHub -->
+    <button id="fs-github" class="fs-btn" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 5 18 5.3 18 5.3c.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+      Login with GitHub
+    </button>
+
+    <div class="fs-sep">Or continue with Email</div>
+
+    <!-- Magic link -->
+    <form id="fs-email-form" novalidate>
+      <label class="fs-label" for="fs-email">Adresse e-mail</label>
+      <input id="fs-email" class="fs-input" type="email"
+             placeholder="toi@exemple.com" autocomplete="email" required>
+
+      <!-- « Let us know you are human » -->
+      <div class="fs-recaptcha">
+        <div class="g-recaptcha"
+             data-sitekey="REMPLACE_MOI_RECAPTCHA"
+             data-callback="fsRecaptchaSolved"
+             data-expired-callback="fsRecaptchaExpired"></div>
+      </div>
+
+      <button id="fs-magic-btn" class="fs-primary-btn" type="submit" disabled>
+        Login with a magic link
+      </button>
+      <p class="fs-hint">Un lien magique sera envoyé à ton e-mail pour finaliser la connexion.</p>
+    </form>
+
+    <div id="fs-msg" class="fs-msg"></div>
+
+    <p class="fs-legal">
+      En continuant, tu acceptes notre
+      <a href="/p/confidentialite.html">Politique de confidentialité</a> et nos
+      <a href="/p/conditions.html">Conditions d'utilisation</a>.
+    </p>
+  </div>
+</div>
+
+<script type="module"
+        src="https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/ui.js"></script>

@@ -1,0 +1,52 @@
+<!-- ==========================================================================
+     PAGE BLOGGER « Mon compte »  ▸  URL cible : /p/mon-compte.html
+     Accessible uniquement aux membres connectés (sinon redirection /login).
+     ========================================================================== -->
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/css/auth.css">
+
+<div class="fs-auth-wrap">
+  <div class="fs-card" id="fs-account" style="display:none;">
+    <img id="fs-avatar" alt="" width="72" height="72"
+         style="border-radius:50%;display:block;margin:0 auto 12px;">
+    <h1 id="fs-name">—</h1>
+    <p class="fs-sub" id="fs-email-line">—</p>
+    <p class="fs-hint">Rôle : <b id="fs-role">membre</b></p>
+
+    <a class="fs-btn" href="/search/label/premium" style="margin-top:16px;">
+      📚 Voir mes articles premium
+    </a>
+    <button id="fs-logout" class="fs-primary-btn" type="button">Se déconnecter</button>
+  </div>
+
+  <div class="fs-card" id="fs-loading">
+    <p class="fs-sub">Chargement de ton compte…</p>
+  </div>
+</div>
+
+<script type="module">
+  import { onUser, logout } from
+    "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/auth.js";
+  import { getUserRole } from
+    "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/membership.js";
+
+  const $ = (s) => document.querySelector(s);
+
+  onUser(async (user) => {
+    if (!user) {
+      // Non connecté ➜ vers login, avec retour ici après connexion.
+      location.href = "/p/login.html?next=" + encodeURIComponent("/p/mon-compte.html");
+      return;
+    }
+    const role = await getUserRole(user.uid);
+    $("#fs-avatar").src   = user.photoURL || "https://www.gravatar.com/avatar/?d=mp";
+    $("#fs-name").textContent      = user.displayName || "Membre";
+    $("#fs-email-line").textContent = user.email || "";
+    $("#fs-role").textContent      = role || "membre";
+    $("#fs-loading").style.display = "none";
+    $("#fs-account").style.display = "block";
+  });
+
+  $("#fs-logout").addEventListener("click", () => logout("/"));
+</script>

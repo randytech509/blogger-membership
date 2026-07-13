@@ -1,0 +1,38 @@
+// ============================================================================
+//  Règles de sécurité Firestore — À COLLER dans Firebase ▸ Firestore ▸ Règles
+//  C'EST ICI que se joue la vraie sécurité (pas dans le fait de cacher l'apiKey).
+// ============================================================================
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Chaque utilisateur ne peut lire/écrire QUE son propre profil.
+    match /users/{uid} {
+      allow read:  if request.auth != null && request.auth.uid == uid;
+
+      // Création à la 1re connexion : rôle forcé à "member", uid cohérent.
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.role == 'member';
+
+      // Mise à jour : l'utilisateur NE PEUT PAS changer son propre rôle.
+      // (promotion en "admin" = à faire à la main dans la console Firebase)
+      allow update: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.role == resource.data.role;
+
+      allow delete: if false;
+    }
+
+    // --- Option B : contenu premium réellement protégé -----------------------
+    // Décommente si tu stockes le vrai contenu premium dans Firestore.
+    // match /premiumContent/{postId} {
+    //   allow read: if request.auth != null
+    //               && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['member','admin'];
+    //   allow write: if false; // écriture depuis la console uniquement
+    // }
+
+    // Tout le reste est refusé par défaut.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
