@@ -26,12 +26,17 @@
 }
 
 .fs-auth-wrap {
-  min-height: 78vh;
   display: flex; align-items: center; justify-content: center;
-  background: var(--fs-bg);
-  padding: 32px 16px;
+  padding: 40px 16px 56px;
   font-family: var(--fs-font);
   color: var(--fs-text);
+}
+
+/* Icônes d'interface (trait, héritent la couleur du texte) */
+.fs-ico {
+  width: 20px; height: 20px; flex: 0 0 auto;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
 }
 
 .fs-card {
@@ -115,12 +120,66 @@
   padding: 28px; text-align: center; background: var(--fs-card);
   box-shadow: var(--fs-shadow); margin: 24px 0; font-family: var(--fs-font);
 }
+.fs-paywall .fs-paywall-ico {
+  width: 40px; height: 40px; color: var(--fs-primary);
+  display: block; margin: 0 auto 12px;
+}
 .fs-paywall h3 { margin: 0 0 8px; }
 .fs-paywall p  { color: var(--fs-muted); margin: 0 0 16px; }
 .fs-paywall .fs-primary-btn { display: inline-block; width: auto; padding: 10px 22px; text-decoration: none; }
 .fs-locked { display: none !important; }   /* (héritage) */
 .fs-premium-slot { min-height: 1px; }
 .fs-premium-content { margin: 8px 0; }
+
+/* ---- Espace membre (mon-compte) : vraie interface de compte ---- */
+.fs-account {
+  max-width: 480px; margin: 40px auto 56px; padding: 0 16px;
+  font-family: var(--fs-font); color: var(--fs-text);
+}
+
+/* En-tête profil : avatar + identité + rôle */
+.fs-profile {
+  display: flex; align-items: center; gap: 16px;
+  padding: 22px; margin-bottom: 20px;
+  background: var(--fs-card); border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius); box-shadow: var(--fs-shadow);
+}
+.fs-profile-avatar {
+  width: 64px; height: 64px; border-radius: 50%;
+  object-fit: cover; flex: 0 0 auto;
+  border: 2px solid var(--fs-border); background: var(--fs-bg);
+}
+.fs-profile-info { min-width: 0; }
+.fs-profile-info h1 {
+  font-size: 20px; font-weight: 700; margin: 0 0 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fs-profile-email {
+  margin: 0 0 8px; font-size: 13px; color: var(--fs-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Liste d'actions type menu de réglages */
+.fs-menu {
+  background: var(--fs-card); border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius); box-shadow: var(--fs-shadow);
+  overflow: hidden;
+}
+.fs-menu-item {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; box-sizing: border-box; padding: 15px 18px;
+  background: none; border: none; border-top: 1px solid var(--fs-border);
+  color: var(--fs-text); font: inherit; font-size: 15px; font-weight: 500;
+  text-align: left; text-decoration: none; cursor: pointer;
+  transition: background .15s;
+}
+.fs-menu-item:first-child { border-top: none; }
+.fs-menu-item:hover { background: rgba(128,128,128,.06); }
+.fs-menu-item .fs-ico { color: var(--fs-primary); }
+.fs-menu-item .fs-label { flex: 1 1 auto; }
+.fs-menu-item .fs-chev { color: var(--fs-muted); width: 16px; height: 16px; }
+.fs-menu-item--danger { color: #dc2626; }
+.fs-menu-item--danger .fs-ico { color: #dc2626; }
 
 /* ---- Espace admin ---- */
 .fs-admin {
@@ -133,7 +192,11 @@
   border-radius: var(--fs-radius); box-shadow: var(--fs-shadow);
   padding: 22px; margin-bottom: 22px;
 }
-.fs-admin-card h2 { margin: 0 0 14px; font-size: 18px; }
+.fs-admin-card h2 {
+  margin: 0 0 14px; font-size: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.fs-admin-card h2 .fs-ico { color: var(--fs-primary); width: 22px; height: 22px; }
 .fs-admin textarea.fs-input { resize: vertical; font-family: ui-monospace, monospace; font-size: 13px; }
 
 .fs-list { list-style: none; padding: 0; margin: 8px 0 0; }

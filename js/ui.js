@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const email = $("#fs-email").value.trim();
     if (!email) { toast("Saisis ton adresse e-mail.", "error"); return; }
     await sendMagicLink(email);
-    toast("✉️ Lien envoyé ! Vérifie ta boîte mail (et les spams).", "success");
+    toast("Lien envoyé ! Vérifie ta boîte mail (et les spams).", "success");
     form.reset();
     window.fsRecaptchaExpired?.();
     if (window.grecaptcha) window.grecaptcha.reset();

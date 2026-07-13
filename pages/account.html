@@ -6,26 +6,44 @@
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/css/auth.css">
 
-<div class="fs-auth-wrap">
-  <div class="fs-card" id="fs-account" style="display:none;">
-    <img id="fs-avatar" alt="" width="72" height="72"
-         style="border-radius:50%;display:block;margin:0 auto 12px;">
-    <h1 id="fs-name">—</h1>
-    <p class="fs-sub" id="fs-email-line">—</p>
-    <p class="fs-hint">Rôle : <b id="fs-role">membre</b></p>
+<div class="fs-account" id="fs-account" style="display:none;">
+  <header class="fs-profile">
+    <img id="fs-avatar" class="fs-profile-avatar" alt="">
+    <div class="fs-profile-info">
+      <h1 id="fs-name">—</h1>
+      <p class="fs-profile-email" id="fs-email-line">—</p>
+      <span class="fs-badge" id="fs-role-badge">membre</span>
+    </div>
+  </header>
 
-    <a class="fs-btn" href="/search/label/premium" style="margin-top:16px;">
-      📚 Voir mes articles premium
+  <nav class="fs-menu">
+    <a class="fs-menu-item" href="/search/label/premium">
+      <svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span class="fs-label">Mes articles premium</span>
+      <svg class="fs-ico fs-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
     </a>
-    <a class="fs-btn" id="fs-admin-link" href="/p/admin.html" style="display:none;">
-      🛠️ Espace admin
-    </a>
-    <button id="fs-logout" class="fs-primary-btn" type="button">Se déconnecter</button>
-  </div>
 
-  <div class="fs-card" id="fs-loading">
-    <p class="fs-sub">Chargement de ton compte…</p>
-  </div>
+    <a class="fs-menu-item" id="fs-admin-link" href="/p/admin.html" style="display:none;">
+      <svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="fs-label">Espace admin</span>
+      <svg class="fs-ico fs-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+
+    <button id="fs-logout" class="fs-menu-item fs-menu-item--danger" type="button">
+      <svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="fs-label">Se déconnecter</span>
+    </button>
+  </nav>
+</div>
+
+<div class="fs-auth-wrap" id="fs-loading">
+  <div class="fs-card"><p class="fs-sub">Chargement de ton compte…</p></div>
 </div>
 
 <script type="module">
@@ -46,8 +64,12 @@
     $("#fs-avatar").src   = user.photoURL || "https://www.gravatar.com/avatar/?d=mp";
     $("#fs-name").textContent      = user.displayName || "Membre";
     $("#fs-email-line").textContent = user.email || "";
-    $("#fs-role").textContent      = role || "membre";
-    if (role === "admin") $("#fs-admin-link").style.display = "flex";
+    const roleBadge = $("#fs-role-badge");
+    roleBadge.textContent = role || "membre";
+    if (role === "admin") {
+      roleBadge.classList.add("fs-badge--admin");
+      $("#fs-admin-link").style.display = "flex";
+    }
     $("#fs-loading").style.display = "none";
     $("#fs-account").style.display = "block";
   });
