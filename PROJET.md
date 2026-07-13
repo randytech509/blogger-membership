@@ -45,14 +45,23 @@ contenu premium (articles étiquetés `premium`).
 - [x] Base Firestore créée (édition Standard, eur3) — compteur reste sur Realtime DB
 - [x] `firestore.rules` déployées en CLI
 
-### ⏳ Reste à faire (côté user — console)
-- [ ] Activer les fournisseurs : Google, magic link (E-mail), GitHub
+### ✅ Fait (backend)
+- [x] Fournisseurs activés : Google + magic link (GitHub à faire)
+- [x] Domaines autorisés ajoutés
+- [x] Clé reCAPTCHA v2 (case UI) intégrée
+- [x] Règles élargies déployées : admin gère membres + premiumContent
+- [x] **Paywall inviolable** codé (`paywall.js` v2, contenu servi depuis Firestore)
+- [x] **Espace admin** codé (`pages/admin.html` : membres + éditeur premium)
+- [x] **App Check** câblé dans la config (garde-fou tant que clé v3 absente)
+
+### ⏳ Reste à faire
+- [ ] Créer clé reCAPTCHA **v3** → me la donner → App Check actif
+- [ ] Enregistrer App Check dans la console (clé secrète v3) puis activer l'enforcement Firestore **après** déploiement des pages
 - [ ] Créer l'OAuth App GitHub (Client ID/Secret → Firebase)
-- [ ] Autoriser les domaines : `andetaynews.com`, `www.andetaynews.com`, `andetaynews.blogspot.com`
-- [ ] Générer la clé reCAPTCHA v2 → remplir `RECAPTCHA_SITE_KEY` + `data-sitekey`, re-push, purge
 - [ ] (Sécurité) restreindre la clé API par référents HTTP + fermer l'alerte GitHub
-- [ ] Coller les 4 pages dans Blogger + snippets thème
-- [ ] Tests (checklist README, Phase 6)
+- [ ] Coller les 5 pages dans Blogger (login, mon-compte, admin, confidentialite, conditions) + snippets thème
+- [ ] Se connecter 1×, puis se promouvoir admin dans Firestore (users/{uid} → role=admin)
+- [ ] Tests (login, paywall, admin, anti-bot)
 
 ## Structure
 
