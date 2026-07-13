@@ -59,12 +59,17 @@ contenu premium (articles étiquetés `premium`).
 - [x] **5 pages publiées** dans Blogger avec bons slugs (login, mon-compte, admin, confidentialite, conditions) — vérifiées en direct
 - [x] Page login validée live : carte « Welcome back », scripts non supprimés, CSS/JS jsDelivr, reCAPTCHA rendu, intégration Plus UI dark
 
+### ✅ Fait (intégration site)
+- [x] Bug magic link corrigé (toggle « lien e-mail sans mot de passe » activé dans Firebase)
+- [x] `nav.js` : icône compte (porte→avatar) injectée dans `ul.headIc` (haut à droite), distincte du profil natif
+- [x] Thème édité : `auth.css` + `paywall.js` + `nav.js` chargés site-wide (insérés au marqueur Plus UI « Custom codes (Global) », ligne 3602). Vérifié : scripts chargés automatiquement en direct.
+
 ### ⏳ Reste à faire
 - [ ] **Se connecter 1× via Google** sur /p/login.html (crée le doc users/{uid})
 - [ ] Se promouvoir admin : Firestore console → users/{uid} → role=admin
-- [ ] Tester /p/mon-compte.html + /p/admin.html
+- [ ] Tester /p/mon-compte.html + /p/admin.html + l'icône compte devenue avatar
 - [ ] Vérifier le graphe App Check (requêtes vérifiées) PUIS activer l'enforcement Firestore
-- [ ] Snippets thème Plus UI (scripts avant </head> + fs-premium-slot) — pour le paywall sur les articles
+- [ ] Snippet thème §2 (`fs-premium-slot` après `<data:post.body/>`) — pour le paywall sur les articles premium
 - [ ] Créer l'OAuth App GitHub (Client ID/Secret → Firebase) pour le bouton GitHub
 - [ ] (Sécurité) restreindre la clé API par référents HTTP + fermer l'alerte GitHub secret-scanning
 
