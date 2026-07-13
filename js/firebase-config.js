@@ -15,12 +15,12 @@ import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 export const firebaseConfig = {
-  apiKey:            "REMPLACE_MOI",
-  authDomain:        "ton-projet.firebaseapp.com",
-  projectId:         "ton-projet",
-  storageBucket:     "ton-projet.appspot.com",
-  messagingSenderId: "000000000000",
-  appId:             "1:000000000000:web:xxxxxxxxxxxx",
+  apiKey:            "AIzaSyDfapcXXSjPsuDvGbDXJ3klPSiu0RDaoeo",
+  authDomain:        "andetaynews-counter.firebaseapp.com",
+  projectId:         "andetaynews-counter",
+  storageBucket:     "andetaynews-counter.firebasestorage.app",
+  messagingSenderId: "883758406481",
+  appId:             "1:883758406481:web:a26aa3dc48d2f7836d1170",
 };
 
 // AndetayNews — domaine personnalisé (blogID 2097219372030182456).
