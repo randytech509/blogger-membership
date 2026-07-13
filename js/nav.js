@@ -12,6 +12,12 @@ const LOGIN_SVG = `<svg class="line" viewBox="0 0 24 24">
   <path d="M10 17l5-5-5-5"></path>
   <path class="c" d="M15 12H3"></path></svg>`;
 
+// Icône « compte » (silhouette) — pour un membre connecté SANS photo de profil,
+// pour ne pas afficher l'icône « connexion » qui laisserait croire à un état déconnecté.
+const ACCOUNT_SVG = `<svg class="line" viewBox="0 0 24 24">
+  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+  <circle cx="12" cy="7" r="4"></circle></svg>`;
+
 function injectAuthIcon() {
   if (document.querySelector("li.isAuth")) return true;   // déjà injecté
   const ul = document.querySelector("ul.headIc");
@@ -38,7 +44,7 @@ function injectAuthIcon() {
         a.innerHTML = `<img src="${user.photoURL}" alt="" referrerpolicy="no-referrer"
           style="width:22px;height:22px;border-radius:50%;display:block;object-fit:cover;">`;
       } else {
-        a.innerHTML = LOGIN_SVG;
+        a.innerHTML = ACCOUNT_SVG;
       }
     } else {
       a.href = "/p/login.html";
