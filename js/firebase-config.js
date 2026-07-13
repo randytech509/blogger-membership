@@ -40,7 +40,7 @@ export const RECAPTCHA_SITE_KEY = "6LcU81EtAAAAANmvPGWqpz84ow-UjykokF9EsC9j";
 // enregistrer l'app dans Firebase ▸ App Check avec cette même clé.
 // Tant que la valeur contient "REMPLACE", App Check reste désactivé (aucune
 // gêne pour la connexion Google en cours de test).
-export const RECAPTCHA_V3_SITE_KEY = "REMPLACE_MOI_RECAPTCHA_V3";
+export const RECAPTCHA_V3_SITE_KEY = "6LcX9lEtAAAAACIxTyPaJUvNITI6k-EehMUiMuJ-";
 
 // Instances uniques réutilisées partout.
 export const app = initializeApp(firebaseConfig);
