@@ -24,6 +24,12 @@ service cloud.firestore {
     function isMember() {
       return hasProfile() && userDoc().role in ['member', 'admin'];
     }
+    // Accès au contenu premium : membre PAYANT (premium == true) ou admin.
+    // Un simple "member" (inscrit gratuit) n'y a PAS accès.
+    function isPremium() {
+      return hasProfile()
+             && (userDoc().role == 'admin' || userDoc().get('premium', false) == true);
+    }
 
     // --- Profils utilisateurs ------------------------------------------------
     match /users/{uid} {
@@ -32,17 +38,22 @@ service cloud.firestore {
       // Lister toute la collection : réservé aux admins (espace admin).
       allow list: if isAdmin();
 
-      // Création à la 1re connexion : rôle forcé à "member", uid cohérent.
+      // Création à la 1re connexion : rôle forcé à "member", premium interdit,
+      // uid cohérent.
       allow create: if isSignedIn()
                     && request.auth.uid == uid
-                    && request.resource.data.role == 'member';
+                    && request.resource.data.role == 'member'
+                    && request.resource.data.get('premium', false) == false;
 
       // Mise à jour :
-      //  - l'utilisateur peut MAJ ses infos SANS changer son rôle ;
-      //  - un admin peut tout modifier (y compris promouvoir un membre).
+      //  - l'utilisateur peut MAJ ses infos SANS changer son rôle NI son statut
+      //    premium (sinon il pourrait s'auto-accorder l'accès payant) ;
+      //  - un admin peut tout modifier (rôle + premium).
       allow update: if isSignedIn() && (
                       (request.auth.uid == uid
-                        && request.resource.data.role == resource.data.role)
+                        && request.resource.data.role == resource.data.role
+                        && request.resource.data.get('premium', false)
+                             == resource.data.get('premium', false))
                       || isAdmin()
                     );
 
@@ -53,7 +64,7 @@ service cloud.firestore {
     // Le vrai contenu vit ici, jamais dans le HTML Blogger. Lisible seulement
     // par un membre connecté ; écrit uniquement depuis l'espace admin.
     match /premiumContent/{postId} {
-      allow read:               if isMember();
+      allow read:               if isPremium();
       allow create, update, delete: if isAdmin();
     }
 

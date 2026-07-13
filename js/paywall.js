@@ -15,13 +15,14 @@
 // ============================================================================
 
 import { onUser } from "./auth.js";
-import { getUserRole, isMember } from "./membership.js";
+import { getUserProfile, hasPremiumAccess } from "./membership.js";
 import { db } from "./firebase-config.js";
 import { doc, getDoc } from
   "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const LOGIN_PATH = "/p/login.html";
 const ADMIN_PATH = "/p/admin.html";
+const ACCOUNT_PATH_MEMBER = "/p/mon-compte.html";
 
 function renderWall(slot, html) {
   const wall = document.createElement("div");
@@ -40,15 +41,28 @@ const ICO_CLOCK = `<svg class="fs-ico fs-paywall-ico" viewBox="0 0 24 24" aria-h
 const ICO_ALERT = `<svg class="fs-ico fs-paywall-ico" viewBox="0 0 24 24" aria-hidden="true">
   <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
   <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+const ICO_STAR = `<svg class="fs-ico fs-paywall-ico" viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
 
+// Visiteur non connecté → invitation à se connecter/s'inscrire.
 function wallForVisitor(slot) {
   renderWall(slot, `
     ${ICO_LOCK}
-    <h3>Contenu réservé aux membres</h3>
-    <p>Connecte-toi (gratuitement) pour lire l'intégralité de cet article.</p>
+    <h3>Contenu réservé</h3>
+    <p>Connecte-toi à ton compte pour accéder à cet article.</p>
     <a class="fs-primary-btn"
        href="${LOGIN_PATH}?next=${encodeURIComponent(location.pathname)}">
        Se connecter / S'inscrire</a>`);
+}
+
+// Connecté mais SANS accès premium (membre gratuit) → invitation à passer premium.
+function wallForNonPremium(slot) {
+  renderWall(slot, `
+    ${ICO_STAR}
+    <h3>Contenu premium</h3>
+    <p>Cet article est réservé aux membres <b>premium</b>. Passe à l'offre premium
+       pour débloquer tout le contenu exclusif.</p>
+    <a class="fs-primary-btn" href="${ACCOUNT_PATH_MEMBER}">Passer premium</a>`);
 }
 
 async function fillSlot(slot, user, role) {
@@ -89,9 +103,13 @@ async function fillSlot(slot, user, role) {
 const slots = document.querySelectorAll(".fs-premium-slot");
 if (slots.length) {
   onUser(async (user) => {
-    if (!user) { slots.forEach(wallForVisitor); return; }
-    const role = await getUserRole(user.uid);
-    if (!isMember(role)) { slots.forEach(wallForVisitor); return; }
+    if (!user) { slots.forEach(wallForVisitor); return; }          // visiteur
+    const profile = await getUserProfile(user.uid);
+    if (!hasPremiumAccess(profile)) {                              // membre non-premium
+      slots.forEach(wallForNonPremium);
+      return;
+    }
+    const role = profile.role || "member";                        // premium ou admin
     slots.forEach((slot) => fillSlot(slot, user, role));
   });
 }

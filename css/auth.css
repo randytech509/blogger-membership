@@ -212,5 +212,10 @@
   font-size: 11px; font-weight: 600; background: rgba(128,128,128,.15); color: var(--fs-muted);
 }
 .fs-badge--admin { background: rgba(26,115,232,.15); color: var(--fs-primary); }
+.fs-badge--premium { background: rgba(245,158,11,.18); color: #b45309; }
+@media (prefers-color-scheme: dark) { .fs-badge--premium { color: #fbbf24; } }
+
+/* Groupe de boutons d'action (espace admin : premium + rôle) */
+.fs-actions { display: inline-flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 
 .fs-btn--sm { width: auto; margin: 0; padding: 7px 12px; font-size: 12px; }

@@ -86,14 +86,26 @@
       const li = document.createElement("li");
       li.className = "fs-row";
       const isAdmin = u.role === "admin";
+      const isPrem  = u.premium === true;
       li.innerHTML = `
         <div>
           <b>${esc(u.displayName) || "(sans nom)"}</b>
           <span class="fs-hint">${esc(u.email)}</span>
           <span class="fs-badge ${isAdmin ? "fs-badge--admin" : ""}">${esc(u.role)}</span>
+          ${isPrem ? '<span class="fs-badge fs-badge--premium">premium</span>' : ""}
         </div>
-        <button class="fs-btn fs-btn--sm">${isAdmin ? "Rétrograder" : "Promouvoir admin"}</button>`;
-      li.querySelector("button").addEventListener("click", async (e) => {
+        <span class="fs-actions">
+          <button class="fs-btn fs-btn--sm" data-act="prem">${isPrem ? "Retirer premium" : "Passer premium"}</button>
+          <button class="fs-btn fs-btn--sm" data-act="role">${isAdmin ? "Rétrograder" : "Promouvoir admin"}</button>
+        </span>`;
+      li.querySelector('[data-act="prem"]').addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        try {
+          await updateDoc(doc(db, "users", d.id), { premium: !isPrem });
+          loadUsers();
+        } catch (err) { alert("Erreur : " + err.message); e.target.disabled = false; }
+      });
+      li.querySelector('[data-act="role"]').addEventListener("click", async (e) => {
         e.target.disabled = true;
         try {
           await updateDoc(doc(db, "users", d.id), { role: isAdmin ? "member" : "admin" });

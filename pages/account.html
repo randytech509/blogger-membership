@@ -13,6 +13,7 @@
       <h1 id="fs-name">—</h1>
       <p class="fs-profile-email" id="fs-email-line">—</p>
       <span class="fs-badge" id="fs-role-badge">membre</span>
+      <span class="fs-badge fs-badge--premium" id="fs-premium-badge" style="display:none;">premium</span>
     </div>
   </header>
 
@@ -49,7 +50,7 @@
 <script type="module">
   import { onUser, logout } from
     "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/auth.js";
-  import { getUserRole } from
+  import { getUserProfile } from
     "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/membership.js";
 
   const $ = (s) => document.querySelector(s);
@@ -60,15 +61,20 @@
       location.href = "/p/login.html?next=" + encodeURIComponent("/p/mon-compte.html");
       return;
     }
-    const role = await getUserRole(user.uid);
+    const profile = await getUserProfile(user.uid);
+    const role = profile ? (profile.role || "membre") : "membre";
     $("#fs-avatar").src   = user.photoURL || "https://www.gravatar.com/avatar/?d=mp";
     $("#fs-name").textContent      = user.displayName || "Membre";
     $("#fs-email-line").textContent = user.email || "";
     const roleBadge = $("#fs-role-badge");
-    roleBadge.textContent = role || "membre";
+    roleBadge.textContent = role;
     if (role === "admin") {
       roleBadge.classList.add("fs-badge--admin");
       $("#fs-admin-link").style.display = "flex";
+    }
+    // Statut premium (accès au contenu payant).
+    if (profile && profile.premium === true) {
+      $("#fs-premium-badge").style.display = "inline-block";
     }
     $("#fs-loading").style.display = "none";
     $("#fs-account").style.display = "block";

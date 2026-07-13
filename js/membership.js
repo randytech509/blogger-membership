@@ -1,7 +1,9 @@
 // ============================================================================
 //  membership.js — profils utilisateurs & rôles dans Firestore
-//  Collection "users" : { uid, email, displayName, photoURL, role, createdAt }
-//  role = "member" (par défaut) | "admin"
+//  Collection "users" : { uid, email, displayName, photoURL, role, premium, createdAt }
+//  role    = "member" (par défaut) | "admin"
+//  premium = false (par défaut) | true  → accès au contenu premium (payant)
+//  Accès au contenu premium = (role == "admin") OU (premium == true).
 // ============================================================================
 
 import { db } from "./firebase-config.js";
@@ -25,6 +27,7 @@ export async function ensureUserProfile(user) {
       displayName: user.displayName || "",
       photoURL:    user.photoURL || "",
       role:        "member",          // rôle attribué à la 1re connexion
+      premium:     false,             // pas d'accès premium par défaut (payant)
       createdAt:   serverTimestamp(),
     });
     return "member";
@@ -46,7 +49,19 @@ export async function getUserRole(uid) {
   return snap.exists() ? (snap.data().role || "member") : null;
 }
 
-// Un membre (ou admin) a-t-il accès au contenu premium ?
+// Lit le profil complet ({ role, premium, ... }) d'un utilisateur connecté.
+export async function getUserProfile(uid) {
+  const snap = await getDoc(doc(db, "users", uid));
+  return snap.exists() ? snap.data() : null;
+}
+
+// Un utilisateur inscrit est-il « membre » (par opposition à visiteur) ?
 export function isMember(role) {
   return role === "member" || role === "admin";
+}
+
+// A-t-il accès au CONTENU PREMIUM (payant) ? Seulement premium == true ou admin.
+// Un simple "member" (inscrit gratuit) est bloqué.
+export function hasPremiumAccess(profile) {
+  return !!profile && (profile.role === "admin" || profile.premium === true);
 }
