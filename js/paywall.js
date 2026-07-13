@@ -1,56 +1,82 @@
 // ============================================================================
-//  paywall.js — restriction du contenu premium (chargé sur TOUT le blog)
+//  paywall.js — PAYWALL INVIOLABLE (le vrai contenu vit dans Firestore)
 //
-//  ⚠️  SÉCURITÉ (option A, côté client) : le contenu premium reste présent dans
-//  le HTML — on ne fait que le MASQUER pour les non-membres. Suffisant contre le
-//  visiteur lambda, PAS contre quelqu'un qui lit le code source. Pour un vrai
-//  verrou, voir l'option B décrite dans le README (contenu stocké dans Firestore).
+//  Le thème insère, dans les articles labellisés "premium", un emplacement vide :
+//     <div class="fs-premium-slot" data-post-id="<ID>"></div>
+//  Ce script :
+//    - visiteur / non-membre  ➜ affiche un mur (le contenu n'est JAMAIS chargé)
+//    - membre                 ➜ récupère premiumContent/<ID> et l'injecte
+//    - admin sans contenu     ➜ propose de le créer dans l'espace admin
 //
-//  Fonctionnement : le thème ajoute la classe `fs-premium` autour du corps des
-//  articles portant le label "premium". Ce script :
-//    - membre connecté   ➜ révèle le contenu
-//    - visiteur          ➜ masque le contenu et affiche un mur d'invitation
+//  Sécurité : les règles Firestore n'autorisent la lecture de premiumContent
+//  qu'aux membres connectés → un visiteur ne peut pas récupérer le contenu,
+//  même en lisant le code source. C'est le vrai verrou (contrairement au
+//  simple masquage CSS).
 // ============================================================================
 
 import { onUser } from "./auth.js";
 import { getUserRole, isMember } from "./membership.js";
+import { db } from "./firebase-config.js";
+import { doc, getDoc } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const LOGIN_PATH = "/p/login.html";
+const ADMIN_PATH = "/p/admin.html";
 
-function lockPremium() {
-  document.querySelectorAll(".fs-premium").forEach((zone) => {
-    if (zone.dataset.fsDone) return;
-    zone.dataset.fsDone = "1";
-    zone.classList.add("fs-locked");           // cache le contenu premium
-
-    const wall = document.createElement("div");
-    wall.className = "fs-paywall";
-    wall.innerHTML = `
-      <h3>🔒 Contenu réservé aux membres</h3>
-      <p>Connecte-toi (gratuitement) pour lire l'intégralité de cet article.</p>
-      <a class="fs-primary-btn"
-         href="${LOGIN_PATH}?next=${encodeURIComponent(location.pathname)}">
-         Se connecter / S'inscrire
-      </a>`;
-    zone.insertAdjacentElement("afterend", wall);
-    zone._fsWall = wall;
-  });
+function renderWall(slot, html) {
+  const wall = document.createElement("div");
+  wall.className = "fs-paywall";
+  wall.innerHTML = html;
+  slot.replaceChildren(wall);
 }
 
-function unlockPremium() {
-  document.querySelectorAll(".fs-premium").forEach((zone) => {
-    zone.classList.remove("fs-locked");
-    if (zone._fsWall) { zone._fsWall.remove(); zone._fsWall = null; }
-    zone.dataset.fsDone = "1";
-  });
+function wallForVisitor(slot) {
+  renderWall(slot, `
+    <h3>🔒 Contenu réservé aux membres</h3>
+    <p>Connecte-toi (gratuitement) pour lire l'intégralité de cet article.</p>
+    <a class="fs-primary-btn"
+       href="${LOGIN_PATH}?next=${encodeURIComponent(location.pathname)}">
+       Se connecter / S'inscrire</a>`);
 }
 
-// Rien à faire s'il n'y a aucun contenu premium sur la page.
-if (document.querySelector(".fs-premium")) {
+async function fillSlot(slot, user, role) {
+  const postId = slot.dataset.postId;
+  if (!postId) return;
+
+  try {
+    const snap = await getDoc(doc(db, "premiumContent", postId));
+    if (snap.exists()) {
+      // Contenu autorisé (règles) → on l'injecte. HTML rédigé par un admin.
+      const div = document.createElement("div");
+      div.className = "fs-premium-content";
+      div.innerHTML = snap.data().html || "";
+      slot.replaceChildren(div);
+    } else if (role === "admin") {
+      renderWall(slot, `
+        <h3>✍️ Aucun contenu premium pour cet article</h3>
+        <p>ID de l'article : <code>${postId}</code></p>
+        <a class="fs-primary-btn"
+           href="${ADMIN_PATH}?post=${encodeURIComponent(postId)}">
+           Ajouter le contenu</a>`);
+    } else {
+      renderWall(slot, `
+        <h3>⏳ Contenu à venir</h3>
+        <p>Le contenu premium de cet article n'est pas encore disponible.</p>`);
+    }
+  } catch (err) {
+    console.error("[paywall]", err);
+    renderWall(slot, `
+      <h3>⚠️ Impossible de charger le contenu</h3>
+      <p>Réessaie dans un instant.</p>`);
+  }
+}
+
+const slots = document.querySelectorAll(".fs-premium-slot");
+if (slots.length) {
   onUser(async (user) => {
-    if (!user) { lockPremium(); return; }
+    if (!user) { slots.forEach(wallForVisitor); return; }
     const role = await getUserRole(user.uid);
-    if (isMember(role)) unlockPremium();
-    else lockPremium();
+    if (!isMember(role)) { slots.forEach(wallForVisitor); return; }
+    slots.forEach((slot) => fillSlot(slot, user, role));
   });
 }

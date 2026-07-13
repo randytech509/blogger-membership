@@ -1,0 +1,160 @@
+<!-- ==========================================================================
+     PAGE BLOGGER « Admin »  ▸  URL cible : /p/admin.html
+     Réservée aux comptes role == "admin". Gère les membres et le contenu premium.
+     ========================================================================== -->
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/css/auth.css">
+
+<div class="fs-admin" id="fs-admin" style="display:none;">
+  <h1>Espace admin</h1>
+
+  <!-- ===== Contenu premium ===== -->
+  <section class="fs-admin-card">
+    <h2>📝 Contenu premium</h2>
+    <p class="fs-hint" style="text-align:left;">
+      Colle l'ID de l'article (visible sur la page premium quand tu es admin, ou
+      dans l'URL d'édition Blogger) et le contenu HTML complet. Il sera servi
+      uniquement aux membres connectés.
+    </p>
+    <label class="fs-label" for="fs-post-id">ID de l'article</label>
+    <input id="fs-post-id" class="fs-input" placeholder="ex. 6928631862492921714">
+
+    <label class="fs-label" for="fs-post-html" style="margin-top:10px;">Contenu HTML</label>
+    <textarea id="fs-post-html" class="fs-input" rows="10"
+              placeholder="<p>Le vrai contenu premium…</p>"></textarea>
+
+    <button id="fs-save-content" class="fs-primary-btn">Enregistrer le contenu</button>
+    <div id="fs-content-msg" class="fs-msg"></div>
+
+    <h3 style="margin-top:22px;">Contenus existants</h3>
+    <ul id="fs-content-list" class="fs-list"><li class="fs-hint">Chargement…</li></ul>
+  </section>
+
+  <!-- ===== Membres ===== -->
+  <section class="fs-admin-card">
+    <h2>👥 Membres</h2>
+    <ul id="fs-users-list" class="fs-list"><li class="fs-hint">Chargement…</li></ul>
+  </section>
+</div>
+
+<div class="fs-auth-wrap" id="fs-gate">
+  <div class="fs-card"><p class="fs-sub" id="fs-gate-msg">Vérification des droits…</p></div>
+</div>
+
+<script type="module">
+  import { onUser } from
+    "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/auth.js";
+  import { getUserRole } from
+    "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/membership.js";
+  import { db } from
+    "https://cdn.jsdelivr.net/gh/randytech509/blogger-membership@main/js/firebase-config.js";
+  import {
+    collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => (s || "").replace(/[&<>"]/g, c =>
+    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+  function msg(el, text, kind) {
+    el.textContent = text; el.className = "fs-msg fs-msg--" + kind;
+    el.style.display = "block";
+  }
+
+  // Pré-remplit l'ID d'article si on arrive depuis ?post=
+  const preset = new URLSearchParams(location.search).get("post");
+  if (preset) $("#fs-post-id").value = preset;
+
+  // ---- Membres ------------------------------------------------------------
+  async function loadUsers() {
+    const list = $("#fs-users-list");
+    const snap = await getDocs(collection(db, "users"));
+    if (snap.empty) { list.innerHTML = "<li class='fs-hint'>Aucun membre.</li>"; return; }
+    list.innerHTML = "";
+    snap.forEach((d) => {
+      const u = d.data();
+      const li = document.createElement("li");
+      li.className = "fs-row";
+      const isAdmin = u.role === "admin";
+      li.innerHTML = `
+        <div>
+          <b>${esc(u.displayName) || "(sans nom)"}</b>
+          <span class="fs-hint">${esc(u.email)}</span>
+          <span class="fs-badge ${isAdmin ? "fs-badge--admin" : ""}">${esc(u.role)}</span>
+        </div>
+        <button class="fs-btn fs-btn--sm">${isAdmin ? "Rétrograder" : "Promouvoir admin"}</button>`;
+      li.querySelector("button").addEventListener("click", async (e) => {
+        e.target.disabled = true;
+        try {
+          await updateDoc(doc(db, "users", d.id), { role: isAdmin ? "member" : "admin" });
+          loadUsers();
+        } catch (err) { alert("Erreur : " + err.message); e.target.disabled = false; }
+      });
+      list.appendChild(li);
+    });
+  }
+
+  // ---- Contenu premium ----------------------------------------------------
+  async function loadContent() {
+    const list = $("#fs-content-list");
+    const snap = await getDocs(collection(db, "premiumContent"));
+    if (snap.empty) { list.innerHTML = "<li class='fs-hint'>Aucun contenu.</li>"; return; }
+    list.innerHTML = "";
+    snap.forEach((d) => {
+      const li = document.createElement("li");
+      li.className = "fs-row";
+      li.innerHTML = `
+        <div><b>${esc(d.id)}</b>
+          <span class="fs-hint">${(d.data().html || "").length} caractères</span></div>
+        <span>
+          <button class="fs-btn fs-btn--sm" data-act="edit">Éditer</button>
+          <button class="fs-btn fs-btn--sm" data-act="del">Suppr.</button>
+        </span>`;
+      li.querySelector('[data-act="edit"]').addEventListener("click", async () => {
+        const s = await getDoc(doc(db, "premiumContent", d.id));
+        $("#fs-post-id").value = d.id;
+        $("#fs-post-html").value = s.data().html || "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      li.querySelector('[data-act="del"]').addEventListener("click", async (e) => {
+        if (!confirm("Supprimer le contenu de " + d.id + " ?")) return;
+        e.target.disabled = true;
+        await deleteDoc(doc(db, "premiumContent", d.id));
+        loadContent();
+      });
+      list.appendChild(li);
+    });
+  }
+
+  $("#fs-save-content").addEventListener("click", async () => {
+    const id = $("#fs-post-id").value.trim();
+    const html = $("#fs-post-html").value;
+    const box = $("#fs-content-msg");
+    if (!id) { msg(box, "Renseigne l'ID de l'article.", "error"); return; }
+    try {
+      await setDoc(doc(db, "premiumContent", id), {
+        html, updatedAt: serverTimestamp(),
+      }, { merge: true });
+      msg(box, "✅ Contenu enregistré.", "success");
+      loadContent();
+    } catch (err) { msg(box, "Erreur : " + err.message, "error"); }
+  });
+
+  // ---- Garde d'accès ------------------------------------------------------
+  onUser(async (user) => {
+    if (!user) {
+      location.href = "/p/login.html?next=" + encodeURIComponent("/p/admin.html");
+      return;
+    }
+    const role = await getUserRole(user.uid);
+    if (role !== "admin") {
+      $("#fs-gate-msg").textContent = "⛔ Accès réservé aux administrateurs.";
+      return;
+    }
+    $("#fs-gate").style.display = "none";
+    $("#fs-admin").style.display = "block";
+    loadUsers();
+    loadContent();
+  });
+</script>

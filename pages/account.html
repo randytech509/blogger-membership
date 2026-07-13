@@ -17,6 +17,9 @@
     <a class="fs-btn" href="/search/label/premium" style="margin-top:16px;">
       📚 Voir mes articles premium
     </a>
+    <a class="fs-btn" id="fs-admin-link" href="/p/admin.html" style="display:none;">
+      🛠️ Espace admin
+    </a>
     <button id="fs-logout" class="fs-primary-btn" type="button">Se déconnecter</button>
   </div>
 
@@ -44,6 +47,7 @@
     $("#fs-name").textContent      = user.displayName || "Membre";
     $("#fs-email-line").textContent = user.email || "";
     $("#fs-role").textContent      = role || "membre";
+    if (role === "admin") $("#fs-admin-link").style.display = "flex";
     $("#fs-loading").style.display = "none";
     $("#fs-account").style.display = "block";
   });
