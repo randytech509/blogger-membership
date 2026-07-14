@@ -21,9 +21,6 @@ service cloud.firestore {
     function isAdmin() {
       return hasProfile() && userDoc().role == 'admin';
     }
-    function isMember() {
-      return hasProfile() && userDoc().role in ['member', 'admin'];
-    }
     // Accès au contenu premium : membre PAYANT (premium == true) ou admin.
     // Un simple "member" (inscrit gratuit) n'y a PAS accès.
     function isPremium() {
